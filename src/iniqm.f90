@@ -6,6 +6,7 @@ module qcxms_iniqm
   use qcxms_use_mndo, only: mndoout, mndograd 
   use qcxms_use_msindo, only: getmsindograd 
   use qcxms_use_orca, only: orcaout, rdorcagrad, rdorcaen 
+  use qcxms_use_generic, only: genericout, rdgenericgrad, rdgenericen 
   use qcxms_use_turbomole, only: initm, rdtmgrad, wrcoord, setfermi, rdtmenergy
   use qcxms_utility, only: getspin, qccall
   use xtb_mctc_accuracy, only: wp
@@ -196,6 +197,16 @@ module qcxms_iniqm
                 & "xtb.last", dum, edum, grad, stat, .false.)
        endif
     
+       ! Q
+       if(prog == 9)then
+          write(*,*)'initializing GENERIC ...'
+          call execute_command_line('rm -f generic.in')
+          call genericout(nat,xyz,iat,chrg,spin,etemp,.false.,ECP)
+          call qccall(9,'job.last')
+          call rdgenericgrad('job.last',nat,grad,dum,dum2,edum)
+!          call execute_command_line('rm -f ORCA.INPUT.prop')
+       endif
+
     
    
        ! Do counter-poise correction
@@ -414,6 +425,27 @@ module qcxms_iniqm
           end if
        endif
     
+       if(prog == 9)then
+          if(newcalc) call execute_command_line('rm -f generic.in')
+          call genericout(nat,xyz,iat,mchrg,spin,etemp,.false.,ECP)
+          if(mchrg == 0)then
+             call qccall(9,'neutral.out')
+             call rdgenericen('neutral.out',energy)
+          else
+             call qccall(9,'ion.out')
+             call rdgenericen('ion.out',energy)
+          endif
+          if(abs(energy) < 1.d-10)then
+             if(mchrg == 0)then
+                call qccall(9,'neutral.out')
+                call rdgenericen('neutral.out',energy)
+             else
+                call qccall(9,'ion.out')
+                call rdgenericen('ion.out',energy)
+             endif
+          endif
+       endif
+
        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
        if (abs(energy) < 1.d-10 .or. stat/=0) then
@@ -460,6 +492,7 @@ module qcxms_iniqm
      use qcxms_use_mndo, only: mndoout, mndograd 
      use qcxms_use_msindo, only: getmsindograd 
      use qcxms_use_orca, only: orcaout, rdorcagrad 
+     use qcxms_use_generic, only: genericout, rdgenericgrad 
      use qcxms_use_turbomole, only: initm, rdtmgrad, setfermi
      use qcxms_utility, only: qccall, getspin
      use xtb_mctc_accuracy, only: wp
@@ -651,6 +684,20 @@ module qcxms_iniqm
         if(.not.ok)then
            gradfail=.true.
            write(*,*) 'QC calc failed!'
+        endif
+     endif
+  
+     if(prog == 9)then
+        call genericout(nuc,xyz,iat,mchrg,spin,etemp,.true.,ECP)
+        call qccall(9,'job.last')
+        call rdgenericgrad('job.last',nuc,grad,qat,aspin,E)
+  ! second attempt
+        call checkqc(nuc,E,grad,qat,ok,mchrg)
+        if(.not.ok) then
+           call qccall(9,'job.last2')
+           call rdgenericgrad('job.last2',nuc,grad,qat,aspin,E)
+           call checkqc(nuc,E,grad,qat,ok,mchrg)
+           if(ok)write(*,*)'healed!'
         endif
      endif
   

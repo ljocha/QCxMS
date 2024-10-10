@@ -33,6 +33,7 @@ srcs += files(
   'msindo.f90',
   'newcommon.f90',
   'orca.f90',
+  'generic.f90',
   'prmat.f90',
   'write_fragments.f90',
   'readcommon.f90',

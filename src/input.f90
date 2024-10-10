@@ -400,6 +400,8 @@ subroutine input(tstep,tmax,ntraj,etemp_in,Tinit, mchrg_prod,                  &
                                     gfnver=3  !Use D4-Method
                                     iprog=8   !calculate IP with XTB2 
          endif
+
+         if(line == 'GENERIC')            prog=9
   
   
          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
