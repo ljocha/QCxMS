@@ -18,7 +18,7 @@ coords = []
 energy = False
 gradient = False
 xyz = False
-charge = 0.
+charge = 0
 
 with open(sys.argv[1]) as inp:
   for l in inp:
@@ -36,7 +36,7 @@ with open(sys.argv[1]) as inp:
 
     if l[:5] == '* xyz':
       xyz = True
-      charge = float(l[5:])
+      charge = int(l[5:])
 
 mol = Chem.RWMol()
 
@@ -48,7 +48,10 @@ for i,c in enumerate(coords):
 
 mol.AddConformer(conf)
 
-DetermineBonds(mol)
+try:
+  DetermineBonds(mol,charge=charge)
+except ValueError:
+  DetermineBonds(mol)
 
 kcalmol_in_Eh = 0.00159362
 bohr_in_A = 0.529177210903
@@ -57,7 +60,7 @@ if energy:
   en = AllChem.UFFGetMoleculeForceField(mol).CalcEnergy() * kcalmol_in_Eh
   print('energy', en)
   print()
-#  print('*** energy', en,file=sys.stderr)
+  print('*** energy', en,file=sys.stderr)
 
 if gradient:
   print('gradient')
@@ -65,7 +68,7 @@ if gradient:
   grad = np.array(ff.CalcGrad()).reshape((-1,3)) * kcalmol_in_Eh / bohr_in_A
   for i,g in enumerate(grad):
     print(i,*g)
-#    print('***',i,*g,file=sys.stderr)
+    print('***',i,*g,file=sys.stderr)
   print()
   
   print('charges and spin populations') # XXX: fuckup

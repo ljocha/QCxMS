@@ -107,6 +107,8 @@ module qcxms_utility
    
    ! ORCA
       if(iprog == 3) write(atmp,'(''orca ORCA.INPUT > '',a)') trim(fout)
+
+      if(iprog == 9) write(atmp,'(''qcgeneric generic.in > '',a)') trim(fout)
    
    ! MNDO99
       if(iprog == 5) write(atmp,'(a,''mndo99 < inp > '',a)') trim(path),trim(fout)
