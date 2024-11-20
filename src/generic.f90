@@ -24,6 +24,7 @@ module qcxms_use_generic
         logical :: ECP
 
         ECP = .False.
+        if(spin == 0) call getspin(nat,iat,chrg,spin)
 
         open(file='generic.in',newunit=io_in)
 
