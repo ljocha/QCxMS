@@ -47,12 +47,13 @@ with open(sys.argv[1]) as inp:
 
 coords = np.array(coords)
 
+# XXX: spin not used, qcxms gives weird numbers
 def op_from_geom(atoms,xyz,charge,spin):
   geom_str = '\n'.join(
     [ atoms[i] + ' ' + ' '.join(map(str,xyz[i])) for i in range(len(atoms)) ]
   )
   
-  driver = PySCFDriver(atom=geom_str, unit=unit, basis=basis, charge=charge, spin=spin)
+  driver = PySCFDriver(atom=geom_str, unit=unit, basis=basis, charge=charge, spin=charge) # XXX
   problem = driver.run()
   e_nr = problem.nuclear_repulsion_energy
   
