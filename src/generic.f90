@@ -30,7 +30,7 @@ module qcxms_use_generic
         write(io_in,'(''energy'')')
         if(grad) write(io_in,'(''gradient'')')
    
-        write(io_in,'(''* xyz ''i3)')chrg
+        write(io_in,'(''* xyz ''2i3)')chrg,spin
         do i=1,nat
            write(io_in,300)toSymbol(iat(i)),xyz(1,i)*autoaa,xyz(2,i)*autoaa,xyz(3,i)*autoaa
         enddo
