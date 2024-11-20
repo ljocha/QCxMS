@@ -15,7 +15,7 @@ from qiskit_algorithms import NumPyMinimumEigensolver
 
 unit = DistanceUnit.ANGSTROM
 basis = 'sto-3g'
-dx = 1e-2
+dx = 1e-5
 
 if len(sys.argv) != 2:
   raise ValueError(f'usage: {sys.argv[0]} input')
